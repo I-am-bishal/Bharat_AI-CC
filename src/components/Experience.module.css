@@ -1,0 +1,188 @@
+.section { padding: var(--section-padding); }
+.insightSection { background: var(--color-bg-2); }
+.gamifySection  { background: var(--color-bg); }
+
+/* ── Section header ── */
+.sectionHead {
+  max-width: 640px;
+  margin-bottom: var(--space-8);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.headVisible { opacity: 1; transform: translateY(0); }
+
+.title {
+  font-size: clamp(26px, 3.5vw, 48px);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: var(--space-4);
+}
+
+/* ── Insight grid ── */
+.insightGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.insightCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  transition: border-color var(--transition-base), transform var(--transition-slow);
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.insightCard.insightVisible {
+  animation: cardIn 0.6s ease forwards;
+}
+
+@keyframes cardIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.insightCard:hover {
+  border-color: var(--color-border-violet);
+  transform: translateY(-4px);
+}
+
+.insightIcon { font-size: 36px; margin-bottom: var(--space-4); }
+
+.insightTitle {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+}
+
+.insightBody {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+  margin-bottom: var(--space-4);
+}
+
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.alertWarn {
+  background: rgba(255, 107, 53, 0.1);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  color: #ff9e7a;
+}
+
+.alertOk {
+  background: var(--color-teal-dim);
+  border: 1px solid var(--color-border-teal);
+  color: var(--color-teal);
+}
+
+/* ── Badge grid ── */
+.badgeGrid {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-7);
+}
+
+.badgeCard {
+  flex: 1;
+  min-width: 160px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 22px 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition-base), transform var(--transition-spring), box-shadow var(--transition-base);
+}
+
+.badgeCard:hover {
+  border-color: var(--color-border-violet);
+  transform: scale(1.04) translateY(-2px);
+  box-shadow: 0 16px 40px rgba(123,47,255,0.15);
+}
+
+.badgeIcon { font-size: 44px; margin-bottom: 10px; }
+.badgeName { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.badgeDesc { font-size: 12px; color: var(--color-text-muted); line-height: 1.4; margin-bottom: 10px; }
+
+.badgeXP {
+  display: inline-block;
+  background: var(--color-teal-dim);
+  border: 1px solid var(--color-border-teal);
+  color: var(--color-teal);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+
+/* ── XP bar ── */
+.xpWrap {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-teal);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+}
+
+.xpHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.xpLabel { font-size: 14px; font-weight: 600; }
+
+.xpLevel { font-size: 14px; color: var(--color-text-muted); }
+
+.xpTrack {
+  height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+
+.xpFill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--color-violet), var(--color-teal));
+  animation: xpGrow 1.8s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+
+@keyframes xpGrow {
+  from { width: 0 !important; }
+}
+
+.xpMilestones {
+  display: flex;
+  justify-content: space-between;
+}
+
+.milestone {
+  font-size: 11px;
+  color: var(--color-text-dim);
+}
+
+.milestoneCurrent { color: var(--color-teal); font-weight: 600; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .insightGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .badgeGrid { flex-direction: column; }
+}

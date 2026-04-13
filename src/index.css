@@ -1,0 +1,296 @@
+/* ====================================================
+   BharatAI — Global Design System
+   ==================================================== */
+
+/* ---------- CSS Custom Properties (Design Tokens) ---------- */
+:root {
+  /* Core palette */
+  --color-bg:         #050a14;
+  --color-bg-2:       #0a1628;
+  --color-bg-3:       #0d1f3c;
+  --color-surface:    rgba(255, 255, 255, 0.04);
+  --color-surface-2:  rgba(255, 255, 255, 0.08);
+
+  /* Brand accents */
+  --color-teal:       #00f5d4;
+  --color-teal-dim:   rgba(0, 245, 212, 0.15);
+  --color-violet:     #7b2fff;
+  --color-violet-dim: rgba(123, 47, 255, 0.15);
+  --color-flame:      #ff6b35;
+  --color-gold:       #ffd166;
+
+  /* Text */
+  --color-text:       #e8f4fd;
+  --color-text-muted: #6b8cae;
+  --color-text-dim:   #3a5068;
+
+  /* Borders */
+  --color-border:     rgba(255, 255, 255, 0.08);
+  --color-border-teal: rgba(0, 245, 212, 0.25);
+  --color-border-violet: rgba(123, 47, 255, 0.3);
+
+  /* Typography */
+  --font-display:  'Clash Display', 'Syne', sans-serif;
+  --font-heading:  'Syne', sans-serif;
+  --font-body:     'DM Sans', sans-serif;
+
+  /* Spacing scale (8px base) */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+  --space-10: 128px;
+
+  /* Radius */
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-full: 9999px;
+
+  /* Shadows / glow */
+  --glow-teal:   0 0 40px rgba(0, 245, 212, 0.25);
+  --glow-violet: 0 0 40px rgba(123, 47, 255, 0.3);
+  --shadow-card: 0 24px 64px rgba(0, 0, 0, 0.5);
+
+  /* Transitions */
+  --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base:   300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   600ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Layout */
+  --max-width: 1280px;
+  --section-padding: clamp(80px, 12vw, 140px) clamp(20px, 5vw, 80px);
+}
+
+/* ---------- Reset ---------- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-teal);
+  border-radius: var(--radius-full);
+}
+
+/* ---------- Typography utilities ---------- */
+.font-display  { font-family: var(--font-display); }
+.font-heading  { font-family: var(--font-heading); }
+.font-body     { font-family: var(--font-body); }
+
+.text-gradient {
+  background: linear-gradient(135deg, #fff 0%, var(--color-teal) 50%, var(--color-violet) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-teal   { color: var(--color-teal); }
+.text-violet { color: var(--color-violet); }
+.text-muted  { color: var(--color-text-muted); }
+
+/* ---------- Layout utilities ---------- */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 clamp(20px, 5vw, 80px);
+}
+
+.section {
+  padding: var(--section-padding);
+}
+
+/* ---------- Glass morphism ---------- */
+.glass {
+  background: var(--color-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+}
+
+.glass-teal {
+  background: var(--color-teal-dim);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border-teal);
+}
+
+/* ---------- Gradient backgrounds ---------- */
+.gradient-mesh {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(123,47,255,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(0,245,212,0.08) 0%, transparent 60%),
+    var(--color-bg);
+}
+
+/* ---------- Section tag / pill ---------- */
+.section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-violet-dim);
+  border: 1px solid var(--color-border-violet);
+  color: var(--color-violet);
+  padding: 6px var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: var(--space-4);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-full);
+  transition: transform var(--transition-spring), box-shadow var(--transition-base);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:active { transform: scale(0.97) !important; }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-violet), var(--color-teal));
+  color: #fff;
+  padding: 14px 36px;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-teal);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--color-border-teal);
+  color: var(--color-text);
+  padding: 14px 36px;
+  backdrop-filter: blur(10px);
+}
+.btn-outline:hover {
+  border-color: var(--color-teal);
+  color: var(--color-teal);
+  box-shadow: 0 0 20px rgba(0,245,212,0.1);
+}
+
+.btn-ghost {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  padding: 10px 20px;
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+}
+.btn-ghost:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+/* ---------- Pulse animation ---------- */
+@keyframes pulse-ring {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(1.5); }
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-teal);
+  animation: pulse-ring 2s infinite;
+  flex-shrink: 0;
+}
+
+/* ---------- Float animation ---------- */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+/* ---------- Fade-in animation ---------- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ---------- Loader ring ---------- */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loader-ring {
+  width: 44px;
+  height: 44px;
+  border: 2px solid rgba(0, 245, 212, 0.15);
+  border-top-color: var(--color-teal);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ---------- XP / progress bar ---------- */
+@keyframes xpGrow {
+  from { width: 0%; }
+}
+
+/* ---------- Typing dots ---------- */
+@keyframes bounce-dot {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+.dot-1 { animation: bounce-dot 0.6s 0s   infinite; }
+.dot-2 { animation: bounce-dot 0.6s 0.15s infinite; }
+.dot-3 { animation: bounce-dot 0.6s 0.3s  infinite; }
+
+/* ---------- Responsive helpers ---------- */
+@media (max-width: 768px) {
+  :root {
+    --section-padding: 72px 20px;
+  }
+  .hide-mobile { display: none !important; }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --section-padding: 56px 16px;
+  }
+}

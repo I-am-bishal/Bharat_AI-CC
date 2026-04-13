@@ -1,0 +1,170 @@
+.section {
+  padding: var(--section-padding);
+  background: var(--color-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Decorative glow orbs ── */
+.orb1 {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(123, 47, 255, 0.12) 0%, transparent 70%);
+  top: -200px;
+  left: -200px;
+  pointer-events: none;
+}
+
+.orb2 {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 245, 212, 0.08) 0%, transparent 70%);
+  bottom: -150px;
+  right: -100px;
+  pointer-events: none;
+}
+
+/* ── Inner ── */
+.inner {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.innerVisible { opacity: 1; transform: translateY(0); }
+
+/* ── Badge ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 245, 212, 0.1);
+  border: 1px solid var(--color-border-teal);
+  border-radius: var(--radius-full);
+  padding: 6px 18px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--color-teal);
+  margin-bottom: var(--space-5);
+}
+
+/* ── Title ── */
+.title {
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: var(--space-5);
+}
+
+/* ── Subtitle ── */
+.subtitle {
+  font-size: 18px;
+  line-height: 1.65;
+  margin-bottom: var(--space-7);
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Feature pills ── */
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: var(--space-7);
+}
+
+.featurePill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  transition: border-color var(--transition-base), color var(--transition-base);
+}
+
+.featurePill:hover {
+  border-color: var(--color-border-teal);
+  color: var(--color-text);
+}
+
+/* ── Buttons ── */
+.buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-8);
+}
+
+/* ── Waitlist ── */
+.waitlist {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-6);
+}
+
+.waitlistLabel {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.emailForm {
+  display: flex;
+  gap: 10px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.emailInput {
+  flex: 1;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 12px 20px;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--transition-base);
+}
+
+.emailInput::placeholder { color: var(--color-text-dim); }
+.emailInput:focus { border-color: var(--color-teal); }
+
+.emailBtn { flex-shrink: 0; padding: 12px 24px; }
+
+.waitlistSuccess {
+  background: var(--color-teal-dim);
+  border: 1px solid var(--color-border-teal);
+  color: var(--color-teal);
+  border-radius: var(--radius-lg);
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* ── Responsive ── */
+@media (max-width: 560px) {
+  .buttons { flex-direction: column; align-items: center; }
+  .buttons .btn { width: 100%; max-width: 360px; justify-content: center; }
+  .emailForm { flex-direction: column; }
+  .emailInput { text-align: center; }
+  .emailBtn { width: 100%; justify-content: center; }
+}
