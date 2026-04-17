@@ -1,0 +1,3909 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>BHARATAI — TRAVEL OS FOR INDIA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+      :root {
+        --bg: #04070f;
+        --bg2: #070d1a;
+        --bg3: #0a1225;
+        --surface: rgba(255, 255, 255, 0.03);
+        --surface2: rgba(255, 255, 255, 0.06);
+        --gold: #c9a84c;
+        --gold2: #e8c97a;
+        --gold-dim: rgba(201, 168, 76, 0.12);
+        --teal: #00d4b4;
+        --teal-dim: rgba(0, 212, 180, 0.1);
+        --cream: #f5f0e8;
+        --text: #e8e4dc;
+        --muted: #6b7a8d;
+        --dim: #1e2a3d;
+        --border: rgba(255, 255, 255, 0.07);
+        --border-g: rgba(201, 168, 76, 0.22);
+        --r: 16px;
+        --rl: 24px;
+        --rxl: 40px;
+        --fd: "Bebas Neue", sans-serif;
+        --fs: "Cormorant Garamond", Georgia, serif;
+        --fb: "Outfit", system-ui, sans-serif;
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      [data-theme="light"] {
+        --bg: #f5f1ea;
+        --bg2: #ede8df;
+        --bg3: #e5dfd4;
+        --surface: rgba(0, 0, 0, 0.03);
+        --surface2: rgba(0, 0, 0, 0.06);
+        --text: #120f0a;
+        --muted: #6b7a8d;
+        --dim: #d0cac0;
+        --border: rgba(0, 0, 0, 0.09);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--fb);
+        font-weight: 400;
+        line-height: 1.6;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        transition:
+          background 0.4s,
+          color 0.4s;
+      }
+
+      ::selection {
+        background: var(--gold);
+        color: #000;
+      }
+
+      ::-webkit-scrollbar {
+        width: 3px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--gold);
+        border-radius: 2px;
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      button {
+        font-family: var(--fb);
+        cursor: pointer;
+        border: none;
+        background: none;
+      }
+
+      input {
+        font-family: var(--fb);
+      }
+
+      /* PROGRESS */
+      #prog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 2px;
+        width: 0;
+        background: linear-gradient(
+          90deg,
+          var(--gold),
+          var(--teal),
+          var(--gold)
+        );
+        background-size: 200%;
+        z-index: 9999;
+        animation: shimmer 2s linear infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 0;
+        }
+
+        100% {
+          background-position: 200%;
+        }
+      }
+
+      /* CURSOR */
+      #cur,
+      #cur-trail {
+        position: fixed;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9998;
+        mix-blend-mode: difference;
+      }
+
+      #cur {
+        width: 10px;
+        height: 10px;
+        background: #fff;
+        transform: translate(-50%, -50%);
+        transition:
+          width 0.3s var(--ease),
+          height 0.3s var(--ease);
+      }
+
+      #cur-trail {
+        width: 38px;
+        height: 38px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+      }
+
+      body:has(a:hover) #cur,
+      body:has(button:hover) #cur {
+        width: 22px;
+        height: 22px;
+      }
+
+      /* LOADER */
+      #loader {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        background: var(--bg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+      }
+
+      .ld-logo {
+        font-family: var(--fd);
+        font-size: clamp(40px, 8vw, 80px);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--text);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: ldRev 0.8s 0.2s var(--ease) forwards;
+      }
+
+      .ld-logo span {
+        color: var(--gold);
+      }
+
+      @keyframes ldRev {
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .ld-bw {
+        width: min(280px, 75vw);
+        height: 1px;
+        background: var(--border);
+      }
+
+      .ld-b {
+        height: 100%;
+        background: linear-gradient(90deg, var(--gold), var(--teal));
+        width: 0;
+        transition: width 0.05s linear;
+      }
+
+      .ld-p {
+        font-family: var(--fd);
+        font-size: 13px;
+        letter-spacing: 3px;
+        color: var(--muted);
+        text-transform: uppercase;
+      }
+
+      /* NAVBAR */
+      #nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px clamp(20px, 5vw, 72px);
+        transition: all 0.4s var(--ease);
+      }
+
+      #nav.scrolled {
+        background: rgba(4, 7, 15, 0.88);
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        border-bottom: 1px solid var(--border);
+        padding: 14px clamp(20px, 5vw, 72px);
+      }
+
+      [data-theme="light"] #nav.scrolled {
+        background: rgba(245, 241, 234, 0.92);
+      }
+
+      .n-logo {
+        font-family: var(--fd);
+        font-size: 24px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--text);
+      }
+
+      .n-logo span {
+        color: var(--gold);
+      }
+
+      .n-links {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+      }
+
+      .n-lnk {
+        font-family: var(--fb);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+        position: relative;
+        transition: color 0.3s;
+        font-weight: 500;
+      }
+
+      .n-lnk::after {
+        content: "";
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--gold);
+        transform: scaleX(0);
+        transition: transform 0.3s var(--ease);
+        transform-origin: left;
+      }
+
+      .n-lnk:hover {
+        color: var(--text);
+      }
+
+      .n-lnk:hover::after,
+      .n-lnk.active::after {
+        transform: scaleX(1);
+      }
+
+      .n-lnk.active {
+        color: var(--gold);
+      }
+
+      .n-acts {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .btn-th {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+      }
+
+      .btn-th:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+      }
+
+      .btn-nv {
+        padding: 10px 22px;
+        border-radius: var(--rxl);
+        background: var(--gold);
+        color: #000;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        transition: all 0.3s var(--ease);
+      }
+
+      .btn-nv:hover {
+        background: var(--gold2);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(201, 168, 76, 0.35);
+      }
+
+      .hbg {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        padding: 4px;
+      }
+
+      .hbg span {
+        display: block;
+        width: 22px;
+        height: 1.5px;
+        background: var(--text);
+        border-radius: 1px;
+        transition: all 0.3s;
+      }
+
+      .hbg.open span:nth-child(1) {
+        transform: translateY(6.5px) rotate(45deg);
+      }
+
+      .hbg.open span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .hbg.open span:nth-child(3) {
+        transform: translateY(-6.5px) rotate(-45deg);
+      }
+
+      /* MOBILE MENU */
+      .mob {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        background: rgba(4, 7, 15, 0.97);
+        backdrop-filter: blur(28px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 36px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s var(--ease);
+      }
+
+      .mob.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .mob a {
+        font-family: var(--fd);
+        font-size: clamp(32px, 7vw, 54px);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text);
+        transition: color 0.3s;
+      }
+
+      .mob a:hover {
+        color: var(--gold);
+      }
+
+      .mob-x {
+        position: absolute;
+        top: 24px;
+        right: clamp(20px, 5vw, 72px);
+        font-size: 28px;
+        color: var(--muted);
+        cursor: pointer;
+        transition: color 0.3s;
+        background: none;
+        border: none;
+        font-family: var(--fb);
+      }
+
+      .mob-x:hover {
+        color: var(--gold);
+      }
+
+      /* HERO */
+      #hero {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      #h-cvs {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        opacity: 0.7;
+      }
+
+      .h-vig {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: radial-gradient(
+          ellipse 80% 80% at 50% 50%,
+          transparent 25%,
+          rgba(4, 7, 15, 0.75) 100%
+        );
+        pointer-events: none;
+      }
+
+      [data-theme="light"] .h-vig {
+        background: radial-gradient(
+          ellipse 80% 80% at 50% 50%,
+          transparent 25%,
+          rgba(245, 241, 234, 0.75) 100%
+        );
+      }
+
+      .h-grain {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+        pointer-events: none;
+      }
+
+      .h-wrap {
+        position: relative;
+        z-index: 2;
+        padding: 120px clamp(24px, 8vw, 120px) 0;
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      .h-eye {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-family: var(--fb);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--gold);
+        margin-bottom: 28px;
+        opacity: 0;
+        transform: translateY(16px);
+        font-weight: 600;
+      }
+
+      .h-eline {
+        width: 32px;
+        height: 1px;
+        background: var(--gold);
+      }
+
+      .h-h1 {
+        font-family: var(--fd);
+        font-size: clamp(56px, 10vw, 140px);
+        line-height: 0.9;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 32px;
+        opacity: 0;
+        transform: translateY(32px);
+      }
+
+      .h-h1 .gold {
+        color: var(--gold);
+      }
+
+      .h-h1 .ghost {
+        -webkit-text-stroke: 1.5px var(--text);
+        color: transparent;
+      }
+
+      .h-p {
+        max-width: 520px;
+        font-size: clamp(15px, 1.8vw, 17px);
+        color: var(--muted);
+        line-height: 1.8;
+        font-weight: 300;
+        margin-bottom: 48px;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      .h-btns {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      .btn-g {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 40px;
+        border-radius: var(--rxl);
+        background: var(--gold);
+        color: #000;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        transition: all 0.4s var(--ease);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-g::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .btn-g:hover {
+        background: var(--gold2);
+        transform: translateY(-2px);
+        box-shadow: 0 20px 50px rgba(201, 168, 76, 0.35);
+      }
+
+      .btn-g:hover::before {
+        opacity: 1;
+      }
+
+      .btn-o {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 40px;
+        border-radius: var(--rxl);
+        border: 1px solid var(--border-g);
+        color: var(--text);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        backdrop-filter: blur(10px);
+        transition: all 0.4s var(--ease);
+      }
+
+      .btn-o:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+        box-shadow: 0 0 30px rgba(201, 168, 76, 0.1);
+      }
+
+      .h-scr {
+        position: absolute;
+        bottom: 48px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        font-family: var(--fb);
+        font-weight: 500;
+        opacity: 0;
+        animation: scBob 3s ease-in-out infinite;
+      }
+
+      .h-sl {
+        width: 1px;
+        height: 48px;
+        background: linear-gradient(to bottom, var(--gold), transparent);
+      }
+
+      @keyframes scBob {
+        0%,
+        100% {
+          transform: translateX(-50%) translateY(0);
+        }
+
+        50% {
+          transform: translateX(-50%) translateY(8px);
+        }
+      }
+
+      .h-stats {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-top: 1px solid var(--border);
+        background: rgba(4, 7, 15, 0.45);
+        backdrop-filter: blur(20px);
+      }
+
+      [data-theme="light"] .h-stats {
+        background: rgba(245, 241, 234, 0.6);
+      }
+
+      .hs {
+        padding: 26px clamp(20px, 4vw, 56px);
+        border-right: 1px solid var(--border);
+      }
+
+      .hs:last-child {
+        border-right: none;
+      }
+
+      .hs-n {
+        font-family: var(--fd);
+        font-size: clamp(28px, 3.5vw, 48px);
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 4px;
+      }
+
+      .hs-l {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 500;
+      }
+
+      /* MARQUEE */
+      .mq {
+        overflow: hidden;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        background: var(--bg2);
+        padding: 16px 0;
+      }
+
+      .mq-t {
+        display: flex;
+        gap: 56px;
+        white-space: nowrap;
+        animation: mqa 28s linear infinite;
+        width: max-content;
+      }
+
+      .mq-t:hover {
+        animation-play-state: paused;
+      }
+
+      .mq-i {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-family: var(--fb);
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+        flex-shrink: 0;
+        font-weight: 500;
+      }
+
+      .mq-d {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--gold);
+        flex-shrink: 0;
+      }
+
+      @keyframes mqa {
+        0% {
+          transform: translateX(0);
+        }
+
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* SECTION BASE */
+      .sec {
+        padding: clamp(80px, 12vw, 160px) clamp(24px, 8vw, 120px);
+      }
+
+      .si {
+        max-width: 1280px;
+        margin: 0 auto;
+      }
+
+      .stag {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--fb);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--gold);
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      .stag-l {
+        width: 26px;
+        height: 1px;
+        background: var(--gold);
+      }
+
+      .s-h2 {
+        font-family: var(--fd);
+        font-size: clamp(38px, 6vw, 88px);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        line-height: 0.92;
+        margin-bottom: 20px;
+      }
+
+      .s-h2 .gold {
+        color: var(--gold);
+      }
+
+      .s-h2 .ghost {
+        -webkit-text-stroke: 1px var(--text);
+        color: transparent;
+      }
+
+      .s-sub {
+        font-size: clamp(14px, 1.5vw, 16px);
+        color: var(--muted);
+        font-weight: 300;
+        line-height: 1.8;
+        max-width: 500px;
+      }
+
+      /* ABOUT */
+      #about {
+        background: var(--bg2);
+      }
+
+      .ab-g {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(40px, 7vw, 100px);
+        align-items: center;
+      }
+
+      .ab-vis {
+        position: relative;
+      }
+
+      .ab-globe {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: var(--rxl);
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .ab-globe canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+      }
+
+      .ab-card {
+        position: absolute;
+        bottom: -20px;
+        right: -20px;
+        background: var(--bg);
+        border: 1px solid var(--border-g);
+        border-radius: var(--r);
+        padding: 20px 24px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+      }
+
+      .ab-cn {
+        font-family: var(--fd);
+        font-size: 40px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: var(--gold);
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+
+      .ab-cl {
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-weight: 600;
+      }
+
+      .ab-tx {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      .ab-q {
+        font-family: var(--fs);
+        font-size: clamp(20px, 2.8vw, 32px);
+        font-weight: 300;
+        font-style: italic;
+        line-height: 1.45;
+        color: var(--text);
+        border-left: 2px solid var(--gold);
+        padding-left: 24px;
+      }
+
+      .ab-b {
+        font-size: 15px;
+        color: var(--muted);
+        line-height: 1.85;
+        font-weight: 300;
+      }
+
+      .ab-ps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .pill {
+        padding: 8px 18px;
+        border-radius: var(--rxl);
+        border: 1px solid var(--border);
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+        transition: all 0.3s;
+        cursor: default;
+      }
+
+      .pill:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+      }
+
+      /* DESTINATIONS */
+      #services {
+        background: var(--bg);
+      }
+
+      .sv-hd {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: clamp(40px, 6vw, 80px);
+        gap: 32px;
+        flex-wrap: wrap;
+      }
+
+      .dg {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+
+      .dc {
+        position: relative;
+        border-radius: var(--rxl);
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.6s var(--ease);
+        border: 1px solid var(--border);
+      }
+
+      .dc:hover {
+        transform: scale(1.025) translateY(-4px);
+      }
+
+      .dc.lg {
+        grid-row: span 2;
+      }
+
+      .di {
+        width: 100%;
+        height: 100%;
+        min-height: 270px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(60px, 8vw, 100px);
+        position: relative;
+        transition: transform 0.8s var(--ease);
+      }
+
+      .dc.lg .di {
+        min-height: 572px;
+        font-size: clamp(80px, 10vw, 130px);
+      }
+
+      .dc:hover .di {
+        transform: scale(1.06);
+      }
+
+      .bg-goa {
+        background: linear-gradient(145deg, #0c3d6e, #1565a8, #c47e1a);
+      }
+
+      .bg-him {
+        background: linear-gradient(145deg, #1a2a4a, #243859, #5a8ab8);
+      }
+
+      .bg-raj {
+        background: linear-gradient(145deg, #5a1e0a, #a33a18, #d4690a);
+      }
+
+      .bg-ker {
+        background: linear-gradient(145deg, #0a2e1e, #145a38, #2a8a5a);
+      }
+
+      .bg-utt {
+        background: linear-gradient(145deg, #1a0f3d, #3a1a7a, #6a3ab8);
+      }
+
+      .dov {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          0deg,
+          rgba(4, 7, 15, 0.96) 0%,
+          rgba(4, 7, 15, 0.15) 55%,
+          transparent 100%
+        );
+      }
+
+      [data-theme="light"] .dov {
+        background: linear-gradient(
+          0deg,
+          rgba(20, 15, 8, 0.96) 0%,
+          rgba(20, 15, 8, 0.15) 55%,
+          transparent 100%
+        );
+      }
+
+      .db {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: clamp(16px, 3vw, 26px);
+        transform: translateY(6px);
+        transition: transform 0.4s var(--ease);
+      }
+
+      .dc:hover .db {
+        transform: none;
+      }
+
+      .dc-cat {
+        font-family: var(--fb);
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 7px;
+        font-weight: 700;
+      }
+
+      .dc-nm {
+        font-family: var(--fd);
+        font-size: clamp(22px, 3vw, 38px);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--cream);
+        margin-bottom: 8px;
+      }
+
+      .dc-mt {
+        display: flex;
+        gap: 14px;
+        font-size: 11px;
+        color: rgba(245, 240, 232, 0.55);
+        margin-bottom: 12px;
+        letter-spacing: 0.04em;
+      }
+
+      .dc-tg {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 14px;
+        border-radius: var(--rxl);
+        background: rgba(201, 168, 76, 0.15);
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        color: var(--gold);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: all 0.3s var(--ease) 0.1s;
+      }
+
+      .dc:hover .dc-tg {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* PLANNER */
+      #planner {
+        background: var(--bg2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      #planner::before {
+        content: "";
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(201, 168, 76, 0.06) 0%,
+          transparent 70%
+        );
+        top: -200px;
+        right: -200px;
+        pointer-events: none;
+      }
+
+      .pl-g {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(40px, 6vw, 80px);
+        align-items: start;
+      }
+
+      .pl-c {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      .rg {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .rl {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .rv2 {
+        font-family: var(--fd);
+        font-size: 22px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--gold);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 1px;
+        background: var(--border);
+        outline: none;
+        cursor: pointer;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--gold);
+        cursor: pointer;
+        box-shadow:
+          0 0 0 4px rgba(201, 168, 76, 0.15),
+          0 0 16px rgba(201, 168, 76, 0.3);
+        transition:
+          box-shadow 0.3s,
+          transform 0.3s;
+      }
+
+      input[type="range"]::-webkit-slider-thumb:hover {
+        box-shadow:
+          0 0 0 8px rgba(201, 168, 76, 0.12),
+          0 0 24px rgba(201, 168, 76, 0.4);
+        transform: scale(1.15);
+      }
+
+      .stags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .st {
+        padding: 9px 18px;
+        border-radius: var(--rxl);
+        border: 1px solid var(--border);
+        font-size: 10px;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+      }
+
+      .st.on {
+        background: var(--gold-dim);
+        border-color: var(--border-g);
+        color: var(--gold);
+      }
+
+      .st:hover:not(.on) {
+        border-color: var(--border-g);
+        color: var(--text);
+      }
+
+      .gen {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 20px;
+        border-radius: var(--rl);
+        background: linear-gradient(135deg, #c9a84c, #a8863a, #c9a84c);
+        background-size: 200%;
+        color: #000;
+        font-family: var(--fd);
+        font-size: 18px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border: none;
+        transition: all 0.4s var(--ease);
+        animation: gradSh 4s linear infinite;
+      }
+
+      .gen:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 50px rgba(201, 168, 76, 0.3);
+      }
+
+      @keyframes gradSh {
+        0% {
+          background-position: 0;
+        }
+
+        100% {
+          background-position: 200%;
+        }
+      }
+
+      #pl-prev {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: var(--rxl);
+        overflow: hidden;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+        transition:
+          border-color 0.4s,
+          box-shadow 0.4s;
+      }
+
+      #pl-prev.lit {
+        border-color: var(--border-g);
+        box-shadow:
+          0 40px 80px rgba(0, 0, 0, 0.3),
+          0 0 0 1px rgba(201, 168, 76, 0.15);
+      }
+
+      .pp-h {
+        padding: 22px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .pp-ic {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: var(--gold-dim);
+        border: 1px solid var(--border-g);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+      }
+
+      .pp-ti {
+        font-family: var(--fd);
+        font-size: 20px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text);
+      }
+
+      .pp-si {
+        font-size: 10px;
+        color: var(--muted);
+        margin-top: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+      }
+
+      .pp-ai {
+        margin-left: auto;
+        padding: 4px 12px;
+        border-radius: var(--rxl);
+        background: var(--teal-dim);
+        border: 1px solid rgba(0, 212, 180, 0.25);
+        color: var(--teal);
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+
+      .pp-ds {
+        padding: 18px 22px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .pp-d {
+        display: flex;
+        gap: 14px;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        align-items: flex-start;
+      }
+
+      .pp-d:last-child {
+        border-bottom: none;
+      }
+
+      .pp-dn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: var(--gold-dim);
+        border: 1px solid var(--border-g);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--fd);
+        font-size: 13px;
+        letter-spacing: 0.05em;
+        color: var(--gold);
+        flex-shrink: 0;
+      }
+
+      .pp-dt {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .pp-dd {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .pp-mo {
+        font-size: 11px;
+        color: var(--muted);
+        padding: 10px 0;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 500;
+      }
+
+      .pp-ft {
+        padding: 20px 22px;
+        border-top: 1px solid var(--border);
+        background: rgba(201, 168, 76, 0.03);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .pp-tl {
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .pp-tot {
+        font-family: var(--fd);
+        font-size: 32px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--gold);
+      }
+
+      .pp-bk {
+        padding: 12px 26px;
+        border-radius: var(--rxl);
+        background: var(--gold);
+        color: #000;
+        font-family: var(--fd);
+        font-size: 14px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s var(--ease);
+      }
+
+      .pp-bk:hover {
+        background: var(--gold2);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(201, 168, 76, 0.3);
+      }
+
+      /* TESTIMONIALS */
+      #testimonials {
+        background: var(--bg);
+      }
+
+      .ts-hd {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 56px;
+        flex-wrap: wrap;
+        gap: 24px;
+      }
+
+      .ts-out {
+        overflow: hidden;
+        border-radius: var(--rxl);
+      }
+
+      .ts-tr {
+        display: flex;
+        gap: 22px;
+        transition: transform 0.75s var(--ease);
+      }
+
+      .ts-c {
+        flex: 0 0 calc(50% - 11px);
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: var(--rxl);
+        padding: 38px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.3s;
+      }
+
+      .ts-c:hover {
+        border-color: var(--border-g);
+      }
+
+      .ts-c::before {
+        content: "\201C";
+        position: absolute;
+        top: 16px;
+        right: 24px;
+        font-family: var(--fs);
+        font-size: 130px;
+        color: var(--gold);
+        opacity: 0.06;
+        line-height: 1;
+        user-select: none;
+      }
+
+      .ts-st {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 18px;
+        color: var(--gold);
+        font-size: 14px;
+      }
+
+      .ts-tx {
+        font-family: var(--fs);
+        font-size: clamp(16px, 1.8vw, 20px);
+        font-weight: 300;
+        font-style: italic;
+        line-height: 1.65;
+        color: var(--text);
+        margin-bottom: 26px;
+      }
+
+      .ts-ft {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .ts-av {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), var(--teal));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--fd);
+        font-size: 14px;
+        letter-spacing: 0.05em;
+        color: #000;
+        flex-shrink: 0;
+      }
+
+      .ts-nm {
+        font-family: var(--fb);
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .ts-lc {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .ts-bg {
+        margin-left: auto;
+        padding: 5px 14px;
+        border-radius: var(--rxl);
+        background: var(--gold-dim);
+        border: 1px solid var(--border-g);
+        font-size: 10px;
+        color: var(--gold);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 700;
+      }
+
+      .ts-ctr {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .ts-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .ts-btn:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+      }
+
+      .ts-dots {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .ts-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 3px;
+        background: var(--dim);
+        cursor: pointer;
+        transition: all 0.35s;
+      }
+
+      .ts-dot.on {
+        width: 22px;
+        background: var(--gold);
+      }
+
+      /* AI CHAT */
+      #ai-chat {
+        background: var(--bg2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      #ai-chat::after {
+        content: "";
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(0, 212, 180, 0.05) 0%,
+          transparent 70%
+        );
+        bottom: -100px;
+        left: -100px;
+        pointer-events: none;
+      }
+
+      .ch-w {
+        max-width: 820px;
+        margin: 56px auto 0;
+      }
+
+      .ch-b {
+        background: var(--bg3);
+        border: 1px solid var(--border-g);
+        border-radius: var(--rxl);
+        overflow: hidden;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+      }
+
+      .ch-hb {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 20px 24px;
+        background: rgba(201, 168, 76, 0.04);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .ch-av {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #c9a84c, #00d4b4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+
+      .ch-nm {
+        font-family: var(--fd);
+        font-size: 17px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text);
+      }
+
+      .ch-st {
+        font-size: 10px;
+        color: var(--teal);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-weight: 600;
+      }
+
+      .st-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--teal);
+        animation: stP 2s infinite;
+        flex-shrink: 0;
+      }
+
+      @keyframes stP {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        50% {
+          opacity: 0.4;
+          transform: scale(1.4);
+        }
+      }
+
+      .ch-clr {
+        margin-left: auto;
+        font-size: 10px;
+        color: var(--muted);
+        padding: 7px 16px;
+        border-radius: var(--rxl);
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+      }
+
+      .ch-clr:hover {
+        border-color: var(--border-g);
+        color: var(--gold);
+      }
+
+      .ch-ms {
+        height: 380px;
+        overflow-y: auto;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        scroll-behavior: smooth;
+      }
+
+      .ch-ms::-webkit-scrollbar {
+        width: 3px;
+      }
+
+      .ch-ms::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 2px;
+      }
+
+      .cm {
+        max-width: 82%;
+        padding: 14px 18px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.65;
+        animation: mIn 0.3s var(--ease);
+        white-space: pre-wrap;
+        font-family: var(--fb);
+      }
+
+      @keyframes mIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .cm.ai {
+        background: rgba(201, 168, 76, 0.06);
+        border: 1px solid rgba(201, 168, 76, 0.12);
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        color: var(--text);
+      }
+
+      .cm.user {
+        background: linear-gradient(
+          135deg,
+          rgba(201, 168, 76, 0.85),
+          rgba(168, 134, 58, 0.95)
+        );
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+        color: #000;
+      }
+
+      .typ-d {
+        display: flex;
+        gap: 5px;
+        padding: 3px 0;
+      }
+
+      .td {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--gold);
+        opacity: 0.5;
+        animation: typ 0.8s infinite;
+      }
+
+      .td:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+
+      .td:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+
+      @keyframes typ {
+        0%,
+        100% {
+          opacity: 0.5;
+          transform: none;
+        }
+
+        50% {
+          opacity: 1;
+          transform: translateY(-5px);
+        }
+      }
+
+      .ch-q {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 0 22px 14px;
+      }
+
+      .cqb {
+        padding: 7px 14px;
+        border-radius: var(--rxl);
+        border: 1px solid var(--border);
+        font-size: 10px;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.3s;
+        font-family: var(--fb);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 230px;
+      }
+
+      .cqb:hover {
+        border-color: var(--border-g);
+        color: var(--gold);
+      }
+
+      .ch-ir {
+        display: flex;
+        gap: 10px;
+        padding: 14px 22px;
+        border-top: 1px solid var(--border);
+      }
+
+      .ch-in {
+        flex: 1;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 13px 18px;
+        color: var(--text);
+        font-family: var(--fb);
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.3s;
+      }
+
+      .ch-in:focus {
+        border-color: var(--border-g);
+      }
+
+      .ch-in::placeholder {
+        color: var(--muted);
+      }
+
+      .ch-in:disabled {
+        opacity: 0.5;
+      }
+
+      .ch-snd {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: var(--gold);
+        border: none;
+        color: #000;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s var(--ease);
+        flex-shrink: 0;
+      }
+
+      .ch-snd:hover {
+        background: var(--gold2);
+        transform: scale(1.07);
+      }
+
+      .ch-snd:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .spin {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(0, 0, 0, 0.2);
+        border-top-color: #000;
+        border-radius: 50%;
+        animation: sp 0.7s linear infinite;
+        display: block;
+      }
+
+      @keyframes sp {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* CTA */
+      #cta {
+        position: relative;
+        overflow: hidden;
+        background: var(--bg);
+        text-align: center;
+        padding: clamp(100px, 15vw, 180px) clamp(24px, 8vw, 120px);
+      }
+
+      .cta-gl {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 800px;
+        height: 800px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(201, 168, 76, 0.08) 0%,
+          transparent 65%
+        );
+        pointer-events: none;
+      }
+
+      .cta-in {
+        position: relative;
+        z-index: 1;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .cta-ey {
+        font-family: var(--fb);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+        color: var(--gold);
+        margin-bottom: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        font-weight: 600;
+      }
+
+      .cta-el {
+        width: 26px;
+        height: 1px;
+        background: var(--gold);
+      }
+
+      .cta-h2 {
+        font-family: var(--fd);
+        font-size: clamp(48px, 8vw, 110px);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        line-height: 0.9;
+        margin-bottom: 22px;
+      }
+
+      .cta-h2 .gold {
+        color: var(--gold);
+      }
+
+      .cta-p {
+        font-size: 16px;
+        color: var(--muted);
+        font-weight: 300;
+        line-height: 1.8;
+        margin-bottom: 48px;
+      }
+
+      .cta-bs {
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 52px;
+      }
+
+      .cta-fm {
+        display: flex;
+        gap: 10px;
+        max-width: 440px;
+        margin: 0 auto;
+      }
+
+      .cta-em {
+        flex: 1;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: var(--rxl);
+        padding: 14px 22px;
+        color: var(--text);
+        font-family: var(--fb);
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.3s;
+      }
+
+      .cta-em:focus {
+        border-color: var(--border-g);
+      }
+
+      .cta-em::placeholder {
+        color: var(--muted);
+      }
+
+      .cta-sb {
+        padding: 14px 26px;
+        border-radius: var(--rxl);
+        background: var(--gold);
+        color: #000;
+        font-family: var(--fd);
+        font-size: 14px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s var(--ease);
+        white-space: nowrap;
+      }
+
+      .cta-sb:hover {
+        background: var(--gold2);
+        transform: translateY(-1px);
+      }
+
+      .cta-ok {
+        background: var(--teal-dim);
+        border: 1px solid rgba(0, 212, 180, 0.2);
+        color: var(--teal);
+        border-radius: var(--r);
+        padding: 14px 24px;
+        font-size: 13px;
+        font-weight: 600;
+        display: none;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .cta-ok.show {
+        display: block;
+      }
+
+      /* FOOTER */
+      footer {
+        background: var(--bg2);
+        border-top: 1px solid var(--border);
+        padding: 80px clamp(24px, 8vw, 120px) 40px;
+      }
+
+      .ft-tp {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+        gap: clamp(28px, 5vw, 80px);
+        margin-bottom: 56px;
+      }
+
+      .ft-lg {
+        font-family: var(--fd);
+        font-size: 30px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+
+      .ft-lg span {
+        color: var(--gold);
+      }
+
+      .ft-tg {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 300;
+        line-height: 1.75;
+        max-width: 280px;
+        margin-bottom: 24px;
+      }
+
+      .ft-sc {
+        display: flex;
+        gap: 8px;
+      }
+
+      .ft-s {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+      }
+
+      .ft-s:hover {
+        border-color: var(--border-g);
+        color: var(--gold);
+      }
+
+      .ft-ct {
+        font-family: var(--fb);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+        margin-bottom: 18px;
+        font-weight: 700;
+      }
+
+      .ft-lk {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+      }
+
+      .ft-lk a {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 300;
+        transition: color 0.3s;
+      }
+
+      .ft-lk a:hover {
+        color: var(--gold);
+      }
+
+      .ft-bt {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding-top: 28px;
+        border-top: 1px solid var(--border);
+      }
+
+      .ft-cp {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 300;
+      }
+
+      .ft-bgs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .ft-bg {
+        padding: 5px 14px;
+        border-radius: var(--rxl);
+        border: 1px solid var(--border);
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+      }
+
+      /* REVEAL */
+      .rv {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.85s var(--ease),
+          transform 0.85s var(--ease);
+      }
+
+      .rv.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      .rv-l {
+        opacity: 0;
+        transform: translateX(-36px);
+        transition:
+          opacity 0.85s var(--ease),
+          transform 0.85s var(--ease);
+      }
+
+      .rv-l.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      .rv-r {
+        opacity: 0;
+        transform: translateX(36px);
+        transition:
+          opacity 0.85s var(--ease),
+          transform 0.85s var(--ease);
+      }
+
+      .rv-r.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      .d1 {
+        transition-delay: 0.1s;
+      }
+
+      .d2 {
+        transition-delay: 0.2s;
+      }
+
+      .d3 {
+        transition-delay: 0.3s;
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 1024px) {
+        .ab-g,
+        .pl-g {
+          grid-template-columns: 1fr;
+        }
+
+        .dg {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .dc.lg {
+          grid-row: span 1;
+        }
+
+        .dc.lg .di {
+          min-height: 270px;
+        }
+
+        .ts-c {
+          flex: 0 0 calc(80% - 11px);
+        }
+
+        .ft-tp {
+          grid-template-columns: 1fr 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .n-links,
+        .btn-nv {
+          display: none;
+        }
+
+        .hbg {
+          display: flex;
+        }
+
+        .dg {
+          grid-template-columns: 1fr;
+        }
+
+        .h-stats {
+          grid-template-columns: 1fr;
+        }
+
+        .hs {
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .hs:last-child {
+          border-bottom: none;
+        }
+
+        .ts-c {
+          flex: 0 0 100%;
+        }
+
+        .ft-tp {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .ft-tp {
+          grid-template-columns: 1fr;
+        }
+
+        .h-btns,
+        .cta-bs {
+          flex-direction: column;
+        }
+
+        .h-btns .btn-g,
+        .h-btns .btn-o,
+        .cta-bs .btn-g,
+        .cta-bs .btn-o {
+          justify-content: center;
+        }
+
+        .cta-fm {
+          flex-direction: column;
+        }
+      }
+
+      [data-theme="light"] .ab-card,
+      [data-theme="light"] #pl-prev,
+      [data-theme="light"] .ch-b,
+      [data-theme="light"] .ts-c {
+        background: var(--bg3);
+      }
+
+      [data-theme="light"] #h-cvs {
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="prog"></div>
+    <div id="cur-trail"></div>
+    <div id="cur"></div>
+
+    <div id="loader">
+      <div class="ld-logo">BHARAT<span>AI</span></div>
+      <div class="ld-bw">
+        <div class="ld-b" id="ld-b"></div>
+      </div>
+      <div class="ld-p" id="ld-p">0%</div>
+    </div>
+
+    <div class="mob" id="mob" role="dialog" aria-label="Navigation">
+      <button class="mob-x" id="mob-x" aria-label="Close">✕</button>
+      <a href="#about" onclick="closeMob()">ABOUT</a>
+      <a href="#services" onclick="closeMob()">DESTINATIONS</a>
+      <a href="#planner" onclick="closeMob()">AI PLANNER</a>
+      <a href="#testimonials" onclick="closeMob()">STORIES</a>
+      <a href="#ai-chat" onclick="closeMob()">AI CHAT</a>
+    </div>
+
+    <header id="nav" role="banner">
+      <a class="n-logo" href="#hero">BHARAT<span>AI</span></a>
+      <nav class="n-links" aria-label="Main navigation">
+        <a class="n-lnk" href="#about">ABOUT</a>
+        <a class="n-lnk" href="#services">DESTINATIONS</a>
+        <a class="n-lnk" href="#planner">AI PLANNER</a>
+        <a class="n-lnk" href="#testimonials">STORIES</a>
+        <a class="n-lnk" href="#ai-chat">AI CHAT</a>
+      </nav>
+      <div class="n-acts">
+        <button class="btn-th" id="th-btn" aria-label="Toggle theme">🌙</button>
+        <a class="btn-nv" href="#ai-chat">TALK TO AI →</a>
+        <button
+          class="hbg"
+          id="hbg"
+          aria-label="Open menu"
+          aria-expanded="false"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <section id="hero">
+      <canvas id="h-cvs"></canvas>
+      <div class="h-grain"></div>
+      <div class="h-vig"></div>
+      <div class="h-wrap">
+        <div class="h-eye" id="h-eye">
+          <div class="h-eline"></div>
+          AI-POWERED TRAVEL OPERATING SYSTEM · INDIA EDITION
+        </div>
+        <h1 class="h-h1" id="h-h1">
+          INDIA<br />WAITS <span class="gold">FOR</span><br /><span
+            class="ghost"
+            >NO ONE.</span
+          >
+        </h1>
+        <p class="h-p" id="h-p">
+          Don't plan a trip. Let intelligence build your perfect Indian journey
+          — from snow-capped Himalayas to golden Goan shores.
+        </p>
+        <div class="h-btns" id="h-btns">
+          <a class="btn-g" href="#planner">⚡ PLAN MY JOURNEY →</a>
+          <a class="btn-o" href="#ai-chat">TALK TO ARYAN AI</a>
+        </div>
+      </div>
+      <div class="h-scr" id="h-scr">
+        <div class="h-sl"></div>
+        SCROLL
+      </div>
+      <div class="h-stats">
+        <div class="hs rv d1">
+          <div class="hs-n" data-count="2.4" data-suffix="M+">0</div>
+          <div class="hs-l">AI-PLANNED TRIPS</div>
+        </div>
+        <div class="hs rv d2">
+          <div class="hs-n" data-count="98" data-suffix="%">0</div>
+          <div class="hs-l">SATISFACTION RATE</div>
+        </div>
+        <div class="hs rv d3">
+          <div class="hs-n" data-count="28" data-suffix="+">0</div>
+          <div class="hs-l">STATES COVERED</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="mq" aria-hidden="true">
+      <div class="mq-t" id="mq-t"></div>
+    </div>
+
+    <section id="about" class="sec">
+      <div class="si">
+        <div class="ab-g">
+          <div class="ab-vis rv-l">
+            <div class="ab-globe" id="ab-globe">
+              <canvas id="ab-cvs"></canvas>
+            </div>
+            <div class="ab-card">
+              <div class="ab-cn">2.4M+</div>
+              <div class="ab-cl">TRIPS PLANNED BY AI</div>
+            </div>
+          </div>
+          <div class="ab-tx rv-r">
+            <div>
+              <div class="stag">
+                <div class="stag-l"></div>
+                OUR PHILOSOPHY
+              </div>
+              <h2 class="s-h2">
+                TRAVEL IS NOT<br />A <span class="gold">DESTINATION.</span>
+              </h2>
+            </div>
+            <p class="ab-q">
+              "The journey of a thousand miles begins with a single conversation
+              with our AI."
+            </p>
+            <p class="ab-b">
+              BharatAI is the world's first Travel Operating System built
+              exclusively for India. We fuse artificial intelligence with the
+              soul of Indian wanderlust — creating journeys that feel
+              handcrafted, never algorithmic.
+            </p>
+            <div class="ab-ps">
+              <span class="pill">🧠 AI-FIRST PLANNING</span>
+              <span class="pill">💰 PRICE INTELLIGENCE</span>
+              <span class="pill">🌦️ WEATHER AI</span>
+              <span class="pill">👥 CROWD PREDICTION</span>
+              <span class="pill">🎮 TRAVEL REWARDS</span>
+              <span class="pill">🔒 TRUST &amp; SAFETY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="sec">
+      <div class="si">
+        <div class="sv-hd">
+          <div>
+            <div class="stag rv">
+              <div class="stag-l"></div>
+              DESTINATIONS
+            </div>
+            <h2 class="s-h2 rv">
+              EXPLORE <span class="gold">INCREDIBLE</span><br /><span
+                class="ghost"
+                >INDIA.</span
+              >
+            </h2>
+          </div>
+          <p class="s-sub rv d2">
+            AI-ANALYSED DESTINATIONS WITH LIVE CROWD DENSITY, PRICE
+            INTELLIGENCE, AND CURATED HIDDEN GEMS — UPDATED EVERY 24 HOURS.
+          </p>
+        </div>
+        <div class="dg">
+          <div
+            class="dc lg"
+            onclick="
+              askAI(
+                'Plan me a Goa beach trip with hidden gems and local food spots',
+              )
+            "
+          >
+            <div class="di bg-goa">
+              🏖️
+              <div class="dov"></div>
+            </div>
+            <div class="db">
+              <div class="dc-cat">BEACHES · WEST INDIA</div>
+              <div class="dc-nm">GOA</div>
+              <div class="dc-mt">
+                <span>🕐 OCT–MAR</span><span>💰 ₹3,500/DAY</span>
+              </div>
+              <div class="dc-tg">🔥 TRENDING NOW</div>
+            </div>
+          </div>
+          <div
+            class="dc"
+            onclick="
+              askAI('Plan a Himachal Pradesh mountain adventure with trekking')
+            "
+          >
+            <div class="di bg-him">
+              🏔️
+              <div class="dov"></div>
+            </div>
+            <div class="db">
+              <div class="dc-cat">MOUNTAINS · NORTH INDIA</div>
+              <div class="dc-nm">HIMACHAL PRADESH</div>
+              <div class="dc-mt">
+                <span>🕐 APR–JUN</span><span>💰 ₹2,800/DAY</span>
+              </div>
+              <div class="dc-tg">❄️ COOL NOW</div>
+            </div>
+          </div>
+          <div
+            class="dc"
+            onclick="askAI('Plan a royal Rajasthan heritage circuit')"
+          >
+            <div class="di bg-raj">
+              🏰
+              <div class="dov"></div>
+            </div>
+            <div class="db">
+              <div class="dc-cat">HERITAGE · WEST INDIA</div>
+              <div class="dc-nm">RAJASTHAN</div>
+              <div class="dc-mt">
+                <span>🕐 NOV–FEB</span><span>💰 ₹4,200/DAY</span>
+              </div>
+              <div class="dc-tg">👑 ROYAL EXPERIENCE</div>
+            </div>
+          </div>
+          <div
+            class="dc"
+            onclick="
+              askAI(
+                'Plan a Kerala backwaters houseboat trip with Ayurveda retreats',
+              )
+            "
+          >
+            <div class="di bg-ker">
+              🌊
+              <div class="dov"></div>
+            </div>
+            <div class="db">
+              <div class="dc-cat">BACKWATERS · SOUTH INDIA</div>
+              <div class="dc-nm">KERALA</div>
+              <div class="dc-mt">
+                <span>🕐 SEP–FEB</span><span>💰 ₹3,900/DAY</span>
+              </div>
+              <div class="dc-tg">🌿 AI TOP PICK</div>
+            </div>
+          </div>
+          <div
+            class="dc"
+            onclick="
+              askAI(
+                'Plan a spiritual journey through Uttarakhand: Rishikesh, Kedarnath, Valley of Flowers',
+              )
+            "
+          >
+            <div class="di bg-utt">
+              🕉️
+              <div class="dov"></div>
+            </div>
+            <div class="db">
+              <div class="dc-cat">SPIRITUAL · NORTH INDIA</div>
+              <div class="dc-nm">UTTARAKHAND</div>
+              <div class="dc-mt">
+                <span>🕐 MAY–NOV</span><span>💰 ₹2,200/DAY</span>
+              </div>
+              <div class="dc-tg">🕉️ SOUL JOURNEY</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="planner" class="sec">
+      <div class="si">
+        <div class="stag rv">
+          <div class="stag-l"></div>
+          AI TRIP BUILDER
+        </div>
+        <h2 class="s-h2 rv">
+          ONE CLICK.<br /><span class="gold">EVERYTHING</span> PLANNED.
+        </h2>
+        <p
+          class="s-sub rv d1"
+          style="
+            margin-bottom: 52px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+          "
+        >
+          SET YOUR BUDGET AND STYLE. AI HANDLES DESTINATION, HOTELS, ITINERARY
+          AND COST BREAKDOWN.
+        </p>
+        <div class="pl-g">
+          <div class="pl-c rv-l">
+            <div class="rg">
+              <div class="rl">
+                BUDGET <span class="rv2" id="bv">₹25,000</span>
+              </div>
+              <input
+                type="range"
+                id="br"
+                min="5000"
+                max="300000"
+                step="5000"
+                value="25000"
+                aria-label="Budget"
+              />
+            </div>
+            <div class="rg">
+              <div class="rl">
+                DURATION <span class="rv2" id="dv">7 DAYS</span>
+              </div>
+              <input
+                type="range"
+                id="dr"
+                min="2"
+                max="30"
+                step="1"
+                value="7"
+                aria-label="Duration"
+              />
+            </div>
+            <div>
+              <div
+                class="rl"
+                style="margin-bottom: 14px; justify-content: flex-start"
+              >
+                TRAVEL STYLE
+              </div>
+              <div class="stags" id="stags">
+                <div class="st on" data-id="beaches">🏖️ BEACHES</div>
+                <div class="st" data-id="mountains">🏔️ MOUNTAINS</div>
+                <div class="st" data-id="heritage">🕌 HERITAGE</div>
+                <div class="st" data-id="spiritual">🕉️ SPIRITUAL</div>
+                <div class="st" data-id="nature">🌿 NATURE</div>
+                <div class="st" data-id="luxury">💎 LUXURY</div>
+                <div class="st" data-id="backpacking">🎒 BACKPACKING</div>
+                <div class="st" data-id="food">🍛 FOOD TRAIL</div>
+              </div>
+            </div>
+            <button class="gen" id="gen-btn">
+              ⚡ GENERATE MY PERFECT TRIP
+            </button>
+          </div>
+          <div id="pl-prev" class="rv-r">
+            <div class="pp-h">
+              <div class="pp-ic" id="pp-ic">🏖️</div>
+              <div>
+                <div class="pp-ti" id="pp-ti">GOA BEACH ESCAPE</div>
+                <div class="pp-si" id="pp-si">
+                  AI-CURATED · 7 DAYS · BEACHES
+                </div>
+              </div>
+              <div class="pp-ai">AI</div>
+            </div>
+            <div class="pp-ds" id="pp-ds"></div>
+            <div class="pp-ft">
+              <div>
+                <div class="pp-tl">ESTIMATED TOTAL</div>
+                <div class="pp-tot" id="pp-tot">₹23,750</div>
+              </div>
+              <button
+                class="pp-bk"
+                onclick="
+                  document
+                    .getElementById('ai-chat')
+                    .scrollIntoView({ behavior: 'smooth' })
+                "
+              >
+                BOOK WITH AI →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="testimonials" class="sec">
+      <div class="si">
+        <div class="ts-hd">
+          <div>
+            <div class="stag rv">
+              <div class="stag-l"></div>
+              TRAVELLER STORIES
+            </div>
+            <h2 class="s-h2 rv">
+              REAL TRIPS,<br /><span class="gold">REAL LOVE.</span>
+            </h2>
+          </div>
+          <div class="ts-ctr rv d2">
+            <button class="ts-btn" id="ts-pv" aria-label="Previous">‹</button>
+            <div class="ts-dots" id="ts-dots"></div>
+            <button class="ts-btn" id="ts-nx" aria-label="Next">›</button>
+          </div>
+        </div>
+        <div class="ts-out">
+          <div class="ts-tr" id="ts-tr"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ai-chat" class="sec">
+      <div class="si">
+        <div class="stag rv">
+          <div class="stag-l"></div>
+          AI TRAVEL COMPANION
+        </div>
+        <h2 class="s-h2 rv">
+          YOUR <span class="gold">PERSONAL</span><br />INDIA EXPERT.
+        </h2>
+        <p
+          class="s-sub rv d1"
+          style="
+            margin-bottom: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+          "
+        >
+          POWERED BY CLAUDE — PLAN TRIPS, FIND HIDDEN GEMS, COMPARE
+          DESTINATIONS.
+        </p>
+        <div class="ch-w">
+          <div class="ch-b">
+            <div class="ch-hb">
+              <div class="ch-av">🤖</div>
+              <div>
+                <div class="ch-nm">ARYAN — AI TRAVEL EXPERT</div>
+                <div class="ch-st">
+                  <div class="st-dot"></div>
+                  ONLINE · KNOWS EVERY CORNER OF INDIA
+                </div>
+              </div>
+              <button class="ch-clr" id="clr-btn">↺ RESET</button>
+            </div>
+            <div class="ch-ms" id="ch-ms"></div>
+            <div class="ch-q" id="ch-q"></div>
+            <div class="ch-ir">
+              <input
+                class="ch-in"
+                id="ch-in"
+                placeholder="Ask about any destination, budget, or itinerary…"
+                maxlength="500"
+              />
+              <button class="ch-snd" id="ch-snd" aria-label="Send">➤</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cta">
+      <div class="cta-gl"></div>
+      <div class="cta-in">
+        <div class="cta-ey rv">
+          <div class="cta-el"></div>
+          START TODAY
+          <div class="cta-el"></div>
+        </div>
+        <h2 class="cta-h2 rv">
+          INDIA IS<br /><span class="gold">CALLING YOU.</span>
+        </h2>
+        <p class="cta-p rv d1">
+          JOIN 2.4 MILLION TRAVELLERS WHO LET AI BUILD THEIR PERFECT INDIAN
+          ADVENTURE. FREE TO START. NO CREDIT CARD REQUIRED.
+        </p>
+        <div class="cta-bs rv d2">
+          <a class="btn-g" href="#planner">⚡ PLAN MY TRIP — FREE</a>
+          <a class="btn-o" href="#ai-chat">TALK TO ARYAN AI</a>
+        </div>
+        <div class="cta-fm rv d3" id="cta-fm">
+          <input
+            class="cta-em"
+            type="email"
+            id="cta-em"
+            placeholder="your@email.com — Get notified at mobile launch"
+          />
+          <button class="cta-sb" id="cta-sb">NOTIFY ME</button>
+        </div>
+        <div class="cta-ok" id="cta-ok">
+          🎉 YOU'RE ON THE LIST! WE'LL REACH YOU AT LAUNCH.
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="ft-tp">
+        <div>
+          <div class="ft-lg">BHARAT<span>AI</span></div>
+          <p class="ft-tg">
+            The world's first AI-powered Travel OS for India. Built with love
+            for every kind of traveller.
+          </p>
+          <div class="ft-sc">
+            <a class="ft-s" href="#" aria-label="X">𝕏</a>
+            <a class="ft-s" href="#" aria-label="Instagram">IG</a>
+            <a class="ft-s" href="#" aria-label="LinkedIn">IN</a>
+            <a class="ft-s" href="#" aria-label="YouTube">YT</a>
+          </div>
+        </div>
+        <div>
+          <div class="ft-ct">EXPLORE</div>
+          <ul class="ft-lk">
+            <li>
+              <a
+                href="#"
+                onclick="
+                  askAI(
+                    'Tell me everything about Goa — best beaches, food, nightlife and hidden spots',
+                  )
+                "
+                >GOA</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="
+                  askAI(
+                    'Tell me about Himachal Pradesh — best treks, places and budget',
+                  )
+                "
+                >HIMACHAL PRADESH</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="
+                  askAI(
+                    'Tell me about Rajasthan — forts, palaces and heritage experiences',
+                  )
+                "
+                >RAJASTHAN</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="
+                  askAI(
+                    'Tell me about Kerala — backwaters, hill stations and Ayurveda',
+                  )
+                "
+                >KERALA</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="
+                  askAI(
+                    'Tell me about Uttarakhand — spiritual sites and adventure options',
+                  )
+                "
+                >UTTARAKHAND</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div>
+          <div class="ft-ct">PLATFORM</div>
+          <ul class="ft-lk">
+            <li><a href="#planner">AI TRIP BUILDER</a></li>
+            <li>
+              <a
+                href="#"
+                onclick="askAI('How does the BharatAI price predictor work?')"
+                >PRICE PREDICTOR</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="
+                  askAI('How does crowd density prediction work on BharatAI?')
+                "
+                >CROWD INSIGHTS</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="
+                  askAI('Tell me about the weather intelligence feature')
+                "
+                >WEATHER AI</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="askAI('How do travel rewards and XP levels work?')"
+                >TRAVEL REWARDS</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div>
+          <div class="ft-ct">COMPANY</div>
+          <ul class="ft-lk">
+            <li><a href="#about">ABOUT BHARATAI</a></li>
+            <li><a href="#">BLOG</a></li>
+            <li><a href="#">CAREERS</a></li>
+            <li><a href="#">PRESS KIT</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="ft-ct">LEGAL</div>
+          <ul class="ft-lk">
+            <li><a href="#">PRIVACY POLICY</a></li>
+            <li><a href="#">TERMS OF SERVICE</a></li>
+            <li><a href="#">COOKIE POLICY</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="ft-bt">
+        <p class="ft-cp">© 2025 BHARATAI TRAVEL OS · MADE WITH ❤️ IN INDIA</p>
+        <div class="ft-bgs">
+          <span class="ft-bg">🔒 SSL SECURED</span>
+          <span class="ft-bg">🇮🇳 INDIA FOCUSED</span>
+          <span class="ft-bg">🤖 AI POWERED</span>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      gsap.registerPlugin(ScrollTrigger);
+
+      // ── SMOOTH SCROLL ALL ANCHOR LINKS ──
+      document.querySelectorAll('a[href^="#"]').forEach((a) => {
+        a.addEventListener("click", (e) => {
+          const id = a.getAttribute("href");
+          if (!id || id === "#") return;
+          const el = document.querySelector(id);
+          if (el) {
+            e.preventDefault();
+            el.scrollIntoView({ behavior: "smooth" });
+          }
+        });
+      });
+
+      // ── PROGRESS BAR ──
+      window.addEventListener(
+        "scroll",
+        () => {
+          document.getElementById("prog").style.width =
+            (scrollY / (document.body.scrollHeight - innerHeight)) * 100 + "%";
+        },
+        { passive: true },
+      );
+
+      // ── CURSOR ──
+      (() => {
+        const c = document.getElementById("cur"),
+          t = document.getElementById("cur-trail");
+        let mx = 0,
+          my = 0,
+          tx = 0,
+          ty = 0;
+        document.addEventListener(
+          "mousemove",
+          (e) => {
+            mx = e.clientX;
+            my = e.clientY;
+            c.style.left = mx + "px";
+            c.style.top = my + "px";
+          },
+          { passive: true },
+        );
+        (function loop() {
+          tx += (mx - tx) * 0.14;
+          ty += (my - ty) * 0.14;
+          t.style.left = tx + "px";
+          t.style.top = ty + "px";
+          requestAnimationFrame(loop);
+        })();
+      })();
+
+      // ── LOADER ──
+      (() => {
+        const bar = document.getElementById("ld-b"),
+          pct = document.getElementById("ld-p"),
+          loader = document.getElementById("loader");
+        let v = 0;
+        const iv = setInterval(() => {
+          v += Math.random() * 15 + 3;
+          if (v >= 100) v = 100;
+          bar.style.width = v + "%";
+          pct.textContent = Math.round(v) + "%";
+          if (v >= 100) {
+            clearInterval(iv);
+            setTimeout(
+              () =>
+                gsap.to(loader, {
+                  opacity: 0,
+                  duration: 0.7,
+                  ease: "power2.inOut",
+                  onComplete: () => {
+                    loader.style.display = "none";
+                    boot();
+                  },
+                }),
+              250,
+            );
+          }
+        }, 55);
+      })();
+
+      // ── NAVBAR SCROLL + ACTIVE ──
+      (() => {
+        const nav = document.getElementById("nav");
+        const lnks = document.querySelectorAll(".n-lnk");
+        const secs = [...document.querySelectorAll("section[id]")];
+        window.addEventListener(
+          "scroll",
+          () => {
+            nav.classList.toggle("scrolled", scrollY > 60);
+            let cur = "";
+            secs.forEach((s) => {
+              if (scrollY >= s.offsetTop - 130) cur = s.id;
+            });
+            lnks.forEach((l) =>
+              l.classList.toggle(
+                "active",
+                l.getAttribute("href") === "#" + cur,
+              ),
+            );
+          },
+          { passive: true },
+        );
+      })();
+
+      // ── HAMBURGER + MOBILE MENU ──
+      (() => {
+        const hbg = document.getElementById("hbg"),
+          mob = document.getElementById("mob"),
+          mx = document.getElementById("mob-x");
+        hbg.addEventListener("click", () => {
+          mob.classList.add("open");
+          hbg.classList.add("open");
+          hbg.setAttribute("aria-expanded", "true");
+        });
+        mx.addEventListener("click", () => closeMob());
+        mob.addEventListener("click", (e) => {
+          if (e.target === mob) closeMob();
+        });
+        window.closeMob = () => {
+          mob.classList.remove("open");
+          hbg.classList.remove("open");
+          hbg.setAttribute("aria-expanded", "false");
+        };
+      })();
+
+      // ── THEME TOGGLE ──
+      (() => {
+        const btn = document.getElementById("th-btn");
+        let dark = true;
+        btn.addEventListener("click", () => {
+          dark = !dark;
+          document.documentElement.setAttribute(
+            "data-theme",
+            dark ? "dark" : "light",
+          );
+          btn.textContent = dark ? "🌙" : "☀️";
+        });
+      })();
+
+      // ── HERO 3D GLOBE ──
+      function initHeroGlobe() {
+        const cvs = document.getElementById("h-cvs");
+        const ren = new THREE.WebGLRenderer({
+          canvas: cvs,
+          alpha: true,
+          antialias: true,
+        });
+        ren.setPixelRatio(Math.min(devicePixelRatio, 2));
+        ren.setSize(innerWidth, innerHeight);
+        const sc = new THREE.Scene(),
+          cam = new THREE.PerspectiveCamera(
+            55,
+            innerWidth / innerHeight,
+            0.1,
+            100,
+          );
+        cam.position.set(0, 0, 4);
+        const globe = new THREE.Mesh(
+          new THREE.SphereGeometry(1.6, 64, 64),
+          new THREE.MeshPhongMaterial({
+            color: 0x0a1225,
+            emissive: 0x040810,
+            specular: 0xc9a84c,
+            shininess: 25,
+          }),
+        );
+        sc.add(globe);
+        sc.add(
+          new THREE.Mesh(
+            new THREE.SphereGeometry(1.62, 28, 28),
+            new THREE.MeshBasicMaterial({
+              color: 0xc9a84c,
+              wireframe: true,
+              opacity: 0.055,
+              transparent: true,
+            }),
+          ),
+        );
+        const mkR = (r, rx, ry, col, op) => {
+          const m = new THREE.Mesh(
+            new THREE.TorusGeometry(r, 0.007, 8, 90),
+            new THREE.MeshBasicMaterial({
+              color: col,
+              opacity: op,
+              transparent: true,
+            }),
+          );
+          m.rotation.x = rx;
+          m.rotation.y = ry;
+          return m;
+        };
+        const r1 = mkR(2.1, Math.PI / 4, 0, 0xc9a84c, 0.4),
+          r2 = mkR(2.3, -Math.PI / 3, Math.PI / 6, 0x00d4b4, 0.25),
+          r3 = mkR(1.9, Math.PI / 2.5, Math.PI / 3, 0xc9a84c, 0.15);
+        sc.add(r1, r2, r3);
+        [
+          { lat: 15, lng: 74, col: 0xc9a84c },
+          { lat: 32, lng: 77, col: 0x00d4b4 },
+          { lat: 27, lng: 76, col: 0xc9a84c },
+          { lat: 10, lng: 76, col: 0x00d4b4 },
+          { lat: 30, lng: 79, col: 0xc9a84c },
+          { lat: 19, lng: 73, col: 0x00d4b4 },
+        ].forEach(({ lat, lng, col }) => {
+          const phi = ((90 - lat) * Math.PI) / 180,
+            theta = ((lng + 180) * Math.PI) / 180,
+            R = 1.63;
+          const p = {
+            x: -R * Math.sin(phi) * Math.cos(theta),
+            y: R * Math.cos(phi),
+            z: R * Math.sin(phi) * Math.sin(theta),
+          };
+          const d = new THREE.Mesh(
+            new THREE.SphereGeometry(0.04, 8, 8),
+            new THREE.MeshBasicMaterial({ color: col }),
+          );
+          d.position.set(p.x, p.y, p.z);
+          const ri = new THREE.Mesh(
+            new THREE.TorusGeometry(0.07, 0.008, 6, 20),
+            new THREE.MeshBasicMaterial({
+              color: col,
+              opacity: 0.5,
+              transparent: true,
+            }),
+          );
+          ri.position.set(p.x, p.y, p.z);
+          ri.lookAt(0, 0, 0);
+          globe.add(d, ri);
+        });
+        const sg = new THREE.BufferGeometry(),
+          sp = new Float32Array(700 * 3);
+        for (let i = 0; i < 700 * 3; i++) sp[i] = (Math.random() - 0.5) * 18;
+        sg.setAttribute("position", new THREE.BufferAttribute(sp, 3));
+        const stars = new THREE.Points(
+          sg,
+          new THREE.PointsMaterial({
+            color: 0xddccaa,
+            size: 0.015,
+            opacity: 0.5,
+            transparent: true,
+          }),
+        );
+        sc.add(stars);
+        sc.add(new THREE.AmbientLight(0x112244, 2));
+        const dl1 = new THREE.DirectionalLight(0xc9a84c, 1.2);
+        dl1.position.set(5, 4, 5);
+        sc.add(dl1);
+        const dl2 = new THREE.DirectionalLight(0x00d4b4, 0.8);
+        dl2.position.set(-5, -2, -3);
+        sc.add(dl2);
+        let mx = 0,
+          my = 0;
+        document.addEventListener(
+          "mousemove",
+          (e) => {
+            mx = (e.clientX / innerWidth - 0.5) * 2;
+            my = (e.clientY / innerHeight - 0.5) * 2;
+          },
+          { passive: true },
+        );
+        window.addEventListener("resize", () => {
+          ren.setSize(innerWidth, innerHeight);
+          cam.aspect = innerWidth / innerHeight;
+          cam.updateProjectionMatrix();
+        });
+        (function anim() {
+          requestAnimationFrame(anim);
+          globe.rotation.y += 0.002;
+          r1.rotation.z += 0.003;
+          r2.rotation.z -= 0.002;
+          r3.rotation.x += 0.001;
+          stars.rotation.y += 0.0003;
+          cam.position.x += (mx * 0.6 - cam.position.x) * 0.015;
+          cam.position.y += (-my * 0.4 - cam.position.y) * 0.015;
+          cam.lookAt(0, 0, 0);
+          ren.render(sc, cam);
+        })();
+      }
+
+      // ── ABOUT GLOBE ──
+      function initAboutGlobe() {
+        const cvs = document.getElementById("ab-cvs"),
+          wrap = document.getElementById("ab-globe");
+        const w = wrap.clientWidth,
+          h = wrap.clientHeight || w;
+        const ren = new THREE.WebGLRenderer({
+          canvas: cvs,
+          alpha: true,
+          antialias: true,
+        });
+        ren.setPixelRatio(Math.min(devicePixelRatio, 2));
+        ren.setSize(w, h);
+        const sc = new THREE.Scene(),
+          cam = new THREE.PerspectiveCamera(50, w / h, 0.1, 100);
+        cam.position.set(0, 0, 3.2);
+        const g = new THREE.Mesh(
+          new THREE.SphereGeometry(1.3, 48, 48),
+          new THREE.MeshPhongMaterial({
+            color: 0x0a1225,
+            emissive: 0x020508,
+            specular: 0xc9a84c,
+            shininess: 20,
+          }),
+        );
+        sc.add(g);
+        sc.add(
+          new THREE.Mesh(
+            new THREE.SphereGeometry(1.32, 20, 20),
+            new THREE.MeshBasicMaterial({
+              color: 0xc9a84c,
+              wireframe: true,
+              opacity: 0.07,
+              transparent: true,
+            }),
+          ),
+        );
+        sc.add(new THREE.AmbientLight(0x112244, 2));
+        const dl = new THREE.DirectionalLight(0xc9a84c, 1.4);
+        dl.position.set(3, 2, 3);
+        sc.add(dl);
+        const dl2 = new THREE.DirectionalLight(0x00d4b4, 0.6);
+        dl2.position.set(-3, -1, -2);
+        sc.add(dl2);
+        new ResizeObserver(() => {
+          const nw = wrap.clientWidth,
+            nh = wrap.clientHeight || nw;
+          ren.setSize(nw, nh);
+          cam.aspect = nw / nh;
+          cam.updateProjectionMatrix();
+        }).observe(wrap);
+        (function a() {
+          requestAnimationFrame(a);
+          g.rotation.y += 0.004;
+          ren.render(sc, cam);
+        })();
+      }
+
+      // ── MARQUEE ──
+      function initMarquee() {
+        const items = [
+          "GOA",
+          "HIMACHAL PRADESH",
+          "RAJASTHAN",
+          "KERALA",
+          "UTTARAKHAND",
+          "MAHARASHTRA",
+          "LADAKH",
+          "ANDAMAN",
+          "SIKKIM",
+          "MEGHALAYA",
+          "COORG",
+          "HAMPI",
+          "VARANASI",
+          "JAISALMER",
+          "RISHIKESH",
+        ];
+        const t = document.getElementById("mq-t");
+        const h = items
+          .map((i) => `<div class="mq-i"><div class="mq-d"></div>${i}</div>`)
+          .join("");
+        t.innerHTML = h + h;
+      }
+
+      // ── SCROLL ANIMATIONS ──
+      function initScrollAnim() {
+        const io = new IntersectionObserver(
+          (es) => {
+            es.forEach((e) => {
+              if (e.isIntersecting) e.target.classList.add("in");
+            });
+          },
+          { threshold: 0.08 },
+        );
+        document
+          .querySelectorAll(".rv,.rv-l,.rv-r")
+          .forEach((el) => io.observe(el));
+        const sio = new IntersectionObserver(
+          (es) => {
+            es.forEach((e) => {
+              if (!e.isIntersecting) return;
+              const el = e.target,
+                target = parseFloat(el.dataset.count),
+                suffix = el.dataset.suffix || "",
+                isF = String(target).includes(".");
+              let cur = 0;
+              const iv = setInterval(() => {
+                cur += target / 60;
+                if (cur >= target) {
+                  cur = target;
+                  clearInterval(iv);
+                }
+                el.textContent =
+                  (isF ? cur.toFixed(1) : Math.round(cur)) + suffix;
+              }, 25);
+              sio.unobserve(el);
+            });
+          },
+          { threshold: 0.5 },
+        );
+        document
+          .querySelectorAll("[data-count]")
+          .forEach((el) => sio.observe(el));
+        gsap.to(".h-h1", {
+          yPercent: -12,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#hero",
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+        gsap.to(".h-p", {
+          yPercent: -8,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#hero",
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+        gsap.utils.toArray(".dc").forEach((c, i) => {
+          gsap.fromTo(
+            c,
+            { opacity: 0, y: 48 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.8,
+              delay: i * 0.07,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: c,
+                start: "top 90%",
+                toggleActions: "play none none none",
+              },
+            },
+          );
+        });
+      }
+
+      // ── HERO ENTRANCE ──
+      function initHeroEntrance() {
+        const tl = gsap.timeline({ delay: 0.1 });
+        tl.to("#h-eye", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" })
+          .to(
+            ".h-h1",
+            { opacity: 1, y: 0, duration: 1, ease: "power3.out" },
+            "-=.5",
+          )
+          .to(
+            ".h-p",
+            { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
+            "-=.6",
+          )
+          .to(
+            "#h-btns",
+            { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" },
+            "-=.5",
+          )
+          .to("#h-scr", { opacity: 1, duration: 0.7 }, "-=.3");
+      }
+
+      // ── PLANNER ──
+      const ITINS = {
+        beaches: {
+          dest: "GOA BEACH ESCAPE",
+          icon: "🏖️",
+          days: [
+            [
+              "ARRIVE + CALANGUTE SUNSET",
+              "Check-in, seafood shack, bonfire night",
+            ],
+            [
+              "OLD GOA HERITAGE TOUR",
+              "Se Cathedral, spice plantation, local market",
+            ],
+            [
+              "WATER SPORTS + PALOLEM",
+              "Kayaking, parasailing, south Goa vibes",
+            ],
+            [
+              "DUDHSAGAR FALLS TREK",
+              "Waterfall, jungle trail, riverside picnic",
+            ],
+            [
+              "ANJUNA FLEA MARKET + DEPARTURE",
+              "Cliff views, souvenir shopping, farewell",
+            ],
+          ],
+        },
+        mountains: {
+          dest: "HIMACHAL MOUNTAIN ODYSSEY",
+          icon: "🏔️",
+          days: [
+            [
+              "DELHI → SHIMLA BY TOY TRAIN",
+              "Mall Road, colonial architecture, pine walks",
+            ],
+            [
+              "SHIMLA → MANALI VIA KULLU",
+              "Beas river rafting, valley views, camp",
+            ],
+            ["SOLANG VALLEY ADVENTURE", "Paragliding, skiing, snow tubing fun"],
+            [
+              "ROHTANG PASS EXCURSION",
+              "Highest motorable road, Himalayan panoramas",
+            ],
+            [
+              "SPITI VALLEY DRIVE",
+              "Key Monastery, Pin Valley, 4000m stargazing",
+            ],
+          ],
+        },
+        heritage: {
+          dest: "RAJASTHAN ROYAL CIRCUIT",
+          icon: "🏰",
+          days: [
+            [
+              "JAIPUR — PINK CITY",
+              "Amber Fort, Hawa Mahal, City Palace, bazaars",
+            ],
+            [
+              "JODHPUR — BLUE CITY",
+              "Mehrangarh Fort, spice market, rooftop café",
+            ],
+            [
+              "JAISALMER — DESERT GOLD",
+              "Camel safari, Sam dunes, folk music night",
+            ],
+            [
+              "UDAIPUR — LAKE CITY",
+              "Lake Palace, Pichola boat ride, Bagore Haveli",
+            ],
+            ["PUSHKAR SACRED LAKE", "Brahma temple, lakeside ghats, farewell"],
+          ],
+        },
+        spiritual: {
+          dest: "UTTARAKHAND DIVINE JOURNEY",
+          icon: "🕉️",
+          days: [
+            [
+              "HARIDWAR GANGA AARTI",
+              "Sacred dip at Har Ki Pauri, fire ceremony",
+            ],
+            [
+              "RISHIKESH YOGA CAPITAL",
+              "Yoga class, Beatles Ashram, white-water rafting",
+            ],
+            ["KEDARNATH YATRA", "Trek or helicopter to 3500m Shiva temple"],
+            [
+              "VALLEY OF FLOWERS TREK",
+              "UNESCO alpine blooms, snow bridges, meadows",
+            ],
+            [
+              "JIM CORBETT SAFARI",
+              "Jeep safari — tigers, elephants, birdwatching",
+            ],
+          ],
+        },
+        nature: {
+          dest: "KERALA GOD'S OWN COUNTRY",
+          icon: "🌿",
+          days: [
+            [
+              "KOCHI FORT AREA ARRIVAL",
+              "Chinese fishing nets, Jewish Synagogue, spice market",
+            ],
+            [
+              "ALLEPPEY HOUSEBOAT CRUISE",
+              "Backwater canals, village life, sunset on deck",
+            ],
+            ["MUNNAR TEA ESTATES", "Tea factory tour, Eravikulam NP wildlife"],
+            [
+              "AYURVEDA RETREAT DAY",
+              "Abhyanga massage, Panchakarma, yoga at dawn",
+            ],
+            [
+              "VARKALA CLIFF BEACH",
+              "Red laterite cliffs, sunset swim, pappad prawns",
+            ],
+          ],
+        },
+        luxury: {
+          dest: "INDIA LUXURY GRAND TOUR",
+          icon: "💎",
+          days: [
+            [
+              "OBEROI UDAIVILAS ARRIVAL",
+              "Lake Palace suite, royal spa, candlelit dinner",
+            ],
+            [
+              "RANTHAMBHORE PRIVATE SAFARI",
+              "Luxury jungle camp, Bengal tiger sightings",
+            ],
+            [
+              "TAJ MAHAL SUNRISE VISIT",
+              "Agra Fort, private heritage guide, high tea",
+            ],
+            [
+              "DELHI FINE DINING + ART",
+              "Gallery walk, Dilli Haat, five-star brunch",
+            ],
+            [
+              "DEPARTURE CONCIERGE",
+              "Private lounge, limousine to international airport",
+            ],
+          ],
+        },
+        backpacking: {
+          dest: "BUDGET INDIA TRAIL",
+          icon: "🎒",
+          days: [
+            [
+              "DELHI OLD CITY TOUR",
+              "Cycle rickshaw, street food, ₹600 guesthouse",
+            ],
+            ["VARANASI GHATS", "Ganga Aarti at dawn, boat ride, cheap thali"],
+            [
+              "RISHIKESH YOGA HOSTEL",
+              "Free yoga class, cliff jumping, ₹400/night",
+            ],
+            [
+              "HAMPI RUINS CYCLE TOUR",
+              "UNESCO boulders, banana pancake café, cheap stay",
+            ],
+            [
+              "GOKARNA QUIET BEACH",
+              "Backpacker paradise, ₹350 beach hut, bonfire",
+            ],
+          ],
+        },
+        food: {
+          dest: "INDIA CULINARY JOURNEY",
+          icon: "🍛",
+          days: [
+            [
+              "DELHI STREET FOOD TRAIL",
+              "Chandni Chowk, paranthe wali gali, jalebi",
+            ],
+            [
+              "AMRITSAR LANGAR + KULCHA",
+              "Golden Temple, butter chicken, lassi",
+            ],
+            [
+              "HYDERABAD DUM BIRYANI",
+              "Authentic biryani, Charminar, Irani chai",
+            ],
+            [
+              "KOLKATA SWEETS + STREET FOOD",
+              "Mishti doi, kathi rolls, phuchka, momo",
+            ],
+            [
+              "MUMBAI SEAFOOD FINALE",
+              "Koliwada prawns, vada pav, Marine Drive farewell",
+            ],
+          ],
+        },
+      };
+      const MULT = {
+        beaches: 0.9,
+        mountains: 1,
+        heritage: 1.2,
+        spiritual: 0.8,
+        nature: 0.95,
+        luxury: 2.8,
+        backpacking: 0.5,
+        food: 1.1,
+      };
+      let aStyle = "beaches";
+
+      function initPlanner() {
+        const br = document.getElementById("br"),
+          dr = document.getElementById("dr");
+        br.addEventListener("input", () => {
+          document.getElementById("bv").textContent =
+            "₹" + Number(br.value).toLocaleString("en-IN");
+          updatePrev();
+        });
+        dr.addEventListener("input", () => {
+          document.getElementById("dv").textContent = dr.value + " DAYS";
+          updatePrev();
+        });
+        document.getElementById("stags").addEventListener("click", (e) => {
+          const t = e.target.closest(".st");
+          if (!t) return;
+          document
+            .querySelectorAll(".st")
+            .forEach((s) => s.classList.remove("on"));
+          t.classList.add("on");
+          aStyle = t.dataset.id;
+          updatePrev();
+        });
+        document
+          .getElementById("gen-btn")
+          .addEventListener("click", generateTrip);
+        updatePrev();
+      }
+
+      function updatePrev() {
+        const budget = Number(document.getElementById("br").value),
+          days = Number(document.getElementById("dr").value);
+        const data = ITINS[aStyle] || ITINS.beaches,
+          total = Math.round(budget * (MULT[aStyle] || 1) * 0.95);
+        document.getElementById("pp-ic").textContent = data.icon;
+        document.getElementById("pp-ti").textContent = data.dest;
+        document.getElementById("pp-si").textContent =
+          "AI-CURATED · " + days + " DAYS · " + aStyle.toUpperCase();
+        document.getElementById("pp-tot").textContent =
+          "₹" + total.toLocaleString("en-IN");
+        const sl = data.days.slice(0, Math.min(days, 5));
+        document.getElementById("pp-ds").innerHTML =
+          sl
+            .map(
+              (d, i) =>
+                '<div class="pp-d"><div class="pp-dn">D' +
+                (i + 1) +
+                '</div><div><div class="pp-dt">' +
+                d[0] +
+                '</div><div class="pp-dd">' +
+                d[1] +
+                "</div></div></div>",
+            )
+            .join("") +
+          (days > 5
+            ? '<div class="pp-d"><div class="pp-mo">+ ' +
+              (days - 5) +
+              " MORE AI-PLANNED DAYS…</div></div>"
+            : "");
+      }
+
+      function generateTrip() {
+        const btn = document.getElementById("gen-btn");
+        btn.textContent = "✓ TRIP GENERATED!";
+        document.getElementById("pl-prev").classList.add("lit");
+        updatePrev();
+        setTimeout(
+          () => (btn.textContent = "⚡ GENERATE MY PERFECT TRIP"),
+          2200,
+        );
+        setTimeout(
+          () =>
+            document
+              .getElementById("pl-prev")
+              .scrollIntoView({ behavior: "smooth", block: "nearest" }),
+          100,
+        );
+      }
+
+      // ── TESTIMONIALS ──
+      const TESTIS = [
+        {
+          name: "PRIYA MEHTA",
+          loc: "Mumbai",
+          av: "PM",
+          stars: 5,
+          text: '"BharatAI planned my entire Kerala trip in under 3 minutes. The AI understood I wanted slow travel, not a rushed checklist. Best trip of my life."',
+          trip: "Kerala · 10 days",
+          saved: "Saved ₹8,400",
+        },
+        {
+          name: "ROHAN SHARMA",
+          loc: "Bengaluru",
+          av: "RS",
+          stars: 5,
+          text: '"The price predictor told me to wait 2 days before booking Rajasthan flights. They dropped 22%. This AI literally pays for itself."',
+          trip: "Rajasthan · 8 days",
+          saved: "Saved ₹6,200",
+        },
+        {
+          name: "ANJALI KAPOOR",
+          loc: "Delhi",
+          av: "AK",
+          stars: 5,
+          text: '"I was sceptical about AI planning my honeymoon — but Aryan nailed every detail. Sunrise kayaking, private houseboat, rooftop dinners. Perfect."',
+          trip: "Kerala + Goa · 12 days",
+          saved: "Saved ₹11,800",
+        },
+        {
+          name: "DEV IYER",
+          loc: "Chennai",
+          av: "DI",
+          stars: 5,
+          text: '"I gave the AI my budget, said I love history and spicy food, and it built a Rajasthan tour that a seasoned travel agent could not have done better."',
+          trip: "Rajasthan · 9 days",
+          saved: "Saved ₹9,100",
+        },
+      ];
+      let tsIdx = 0,
+        tsAuto;
+
+      function initTestimonials() {
+        const tr = document.getElementById("ts-tr"),
+          dots = document.getElementById("ts-dots");
+        tr.innerHTML = TESTIS.map(
+          (t) =>
+            '<div class="ts-c"><div class="ts-st">' +
+            "★".repeat(t.stars) +
+            '</div><div class="ts-tx">' +
+            t.text +
+            '</div><div class="ts-ft"><div class="ts-av">' +
+            t.av +
+            '</div><div><div class="ts-nm">' +
+            t.name +
+            '</div><div class="ts-lc">📍 ' +
+            t.loc +
+            '</div></div><div class="ts-bg">' +
+            t.trip +
+            ' · <span style="color:var(--teal)">' +
+            t.saved +
+            "</span></div></div></div>",
+        ).join("");
+        dots.innerHTML = TESTIS.map(
+          (_, i) =>
+            '<div class="ts-dot' +
+            (i === 0 ? " on" : "") +
+            '" onclick="goTs(' +
+            i +
+            ')" role="button" aria-label="Slide ' +
+            (i + 1) +
+            '"></div>',
+        ).join("");
+        document.getElementById("ts-pv").onclick = () =>
+          goTs((tsIdx - 1 + TESTIS.length) % TESTIS.length);
+        document.getElementById("ts-nx").onclick = () =>
+          goTs((tsIdx + 1) % TESTIS.length);
+        startTsAuto();
+        tr.addEventListener("mouseenter", () => clearInterval(tsAuto));
+        tr.addEventListener("mouseleave", () => startTsAuto());
+      }
+
+      function startTsAuto() {
+        clearInterval(tsAuto);
+        tsAuto = setInterval(() => goTs((tsIdx + 1) % TESTIS.length), 5000);
+      }
+
+      window.goTs = function (idx) {
+        tsIdx = idx;
+        const card = document.querySelector(".ts-c");
+        if (!card) return;
+        const cw = card.getBoundingClientRect().width + 22;
+        document.getElementById("ts-tr").style.transform =
+          "translateX(-" + idx * cw + "px)";
+        document
+          .querySelectorAll(".ts-dot")
+          .forEach((d, i) => d.classList.toggle("on", i === idx));
+      };
+      window.addEventListener("resize", () => goTs(tsIdx), { passive: true });
+
+      // ── AI CHAT ──
+      const SYS =
+        'You are Aryan, a warm, expert, slightly opinionated AI travel companion for India. You know every corner of India — hidden waterfalls, royal palaces, street-food lanes, Ayurvedic retreats. Give specific, actionable advice with enthusiasm. Keep responses 3-5 sentences — rich but concise. Use emojis naturally. Quote prices in Indian Rupees. End with one proactive follow-up question. Frame hotel/price estimates as "typically" or "around". Be opinionated — tell what locals actually do vs tourist traps.';
+      const GREETING =
+        "NAMASTE! 🙏\n\nI'M ARYAN, YOUR AI TRAVEL COMPANION FOR INDIA. I CAN PLAN COMPLETE ITINERARIES, FIND HIDDEN GEMS, PREDICT THE BEST TRAVEL WINDOWS, AND COMPARE DESTINATIONS.\n\nWHAT KIND OF INDIAN ADVENTURE ARE YOU DREAMING OF?";
+      const QS = [
+        "BEST BUDGET TRIP UNDER ₹15,000 FOR 5 DAYS?",
+        "HIDDEN GEMS MOST TOURISTS MISS?",
+        "BEST TIME TO VISIT KERALA?",
+        "PLAN RAJASTHAN ROYAL TOUR — 10 DAYS",
+      ];
+      let hist = [];
+
+      function initChat() {
+        addMsg("ai", GREETING);
+        document.getElementById("ch-q").innerHTML = QS.map(
+          (q, i) => '<button class="cqb" data-i="' + i + '">' + q + "</button>",
+        ).join("");
+        document.getElementById("ch-q").addEventListener("click", (e) => {
+          const b = e.target.closest(".cqb");
+          if (b) quickAsk(parseInt(b.dataset.i));
+        });
+        document.getElementById("ch-in").addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMsg();
+          }
+        });
+        document.getElementById("ch-snd").addEventListener("click", sendMsg);
+        document.getElementById("clr-btn").addEventListener("click", clearChat);
+      }
+
+      function addMsg(role, text) {
+        const box = document.getElementById("ch-ms"),
+          d = document.createElement("div");
+        d.className = "cm " + role;
+        d.textContent = text;
+        box.appendChild(d);
+        requestAnimationFrame(() => (box.scrollTop = box.scrollHeight));
+      }
+
+      function setTyping(on) {
+        const box = document.getElementById("ch-ms"),
+          btn = document.getElementById("ch-snd"),
+          inp = document.getElementById("ch-in");
+        if (on) {
+          const d = document.createElement("div");
+          d.className = "cm ai";
+          d.id = "typ-m";
+          d.innerHTML =
+            '<div class="typ-d"><div class="td"></div><div class="td"></div><div class="td"></div></div>';
+          box.appendChild(d);
+          requestAnimationFrame(() => (box.scrollTop = box.scrollHeight));
+          btn.disabled = true;
+          inp.disabled = true;
+          btn.innerHTML = '<div class="spin"></div>';
+        } else {
+          document.getElementById("typ-m")?.remove();
+          btn.disabled = false;
+          inp.disabled = false;
+          btn.textContent = "➤";
+        }
+      }
+
+      async function sendMsg() {
+        const inp = document.getElementById("ch-in"),
+          msg = inp.value.trim();
+        if (!msg || document.getElementById("ch-snd").disabled) return;
+        inp.value = "";
+        addMsg("user", msg);
+        hist.push({ role: "user", content: msg });
+        setTyping(true);
+        try {
+          const res = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "claude-sonnet-4-20250514",
+              max_tokens: 500,
+              system: SYS,
+              messages: hist.slice(-12),
+            }),
+          });
+          const data = await res.json();
+          setTyping(false);
+          const reply =
+            data.content?.[0]?.text || "OOPS! CONNECTION HICCUP. TRY AGAIN 🙏";
+          addMsg("ai", reply);
+          hist.push({ role: "assistant", content: reply });
+        } catch (err) {
+          setTyping(false);
+          addMsg("ai", "NETWORK HICCUP! PLEASE TRY AGAIN IN A MOMENT 🙏");
+        }
+      }
+
+      window.clearChat = () => {
+        hist = [];
+        document.getElementById("ch-ms").innerHTML = "";
+        addMsg("ai", GREETING);
+      };
+      window.quickAsk = (i) => {
+        document.getElementById("ch-in").value = QS[i];
+        sendMsg();
+      };
+      window.askAI = (q) => {
+        document
+          .getElementById("ai-chat")
+          .scrollIntoView({ behavior: "smooth" });
+        setTimeout(() => {
+          document.getElementById("ch-in").value = q;
+          sendMsg();
+        }, 700);
+      };
+
+      // ── CTA EMAIL ──
+      document.getElementById("cta-sb").addEventListener("click", () => {
+        const em = document.getElementById("cta-em"),
+          v = em.value.trim();
+        if (!v || !v.includes("@")) {
+          em.focus();
+          em.style.borderColor = "rgba(255,80,80,.5)";
+          setTimeout(() => (em.style.borderColor = ""), 1500);
+          return;
+        }
+        document.getElementById("cta-fm").style.display = "none";
+        document.getElementById("cta-ok").classList.add("show");
+      });
+
+      // ── BOOT ──
+      function boot() {
+        initHeroGlobe();
+        initAboutGlobe();
+        initMarquee();
+        initScrollAnim();
+        initHeroEntrance();
+        initPlanner();
+        initTestimonials();
+        initChat();
+      }
+    </script>
+  </body>
+</html>
